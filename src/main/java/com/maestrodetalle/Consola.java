@@ -26,7 +26,7 @@ public class Consola implements Runnable {
     //camaraConsola imagen;
 
     personaDTO personaDto;
-    String Ruta = "C:\\Users\\emman\\OneDrive\\Escritorio\\maestroDetalle\\maestroDetalle\\empleado.png";
+    String Ruta = "C:\\Users\\ASUS\\Documents\\NetBeansProjects\\ProyectoMaestroDetalle\\empleado.png";
     empleadoGestion empleadogestion = new empleadoGestion();
     
     @Override

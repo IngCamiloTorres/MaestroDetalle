@@ -5,7 +5,7 @@ import java.util.Properties;
 
 public class DB {
     
-    private static final String DB_FACTORY_PROPERTY_URL = "C:\\Users\\emman\\OneDrive\\Escritorio\\maestroDetalle\\maestroDetalle\\src\\main\\java\\com\\maestrodetalle\\properties\\DB.properties";
+    private static final String DB_FACTORY_PROPERTY_URL = "C:\\Users\\ASUS\\Documents\\NetBeansProjects\\ProyectoMaestroDetalle\\src\\main\\java\\com\\maestrodetalle\\properties\\DB.properties";
     private static final String DEFAULT_DB_CLASS_PROP = "defaultDBClass";
     
     private static DB dbAdapter;

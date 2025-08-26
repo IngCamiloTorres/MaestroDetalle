@@ -58,7 +58,7 @@ public class empleadoGestion extends javax.swing.JPanel implements Observador {
     private byte[] videoBytes = null;
     private byte[] videoBytesGuardar = null;
     private byte[] videoBytesNube = null;
-    String rutaDirectorio = "C:\\Users\\emman\\OneDrive\\Escritorio\\maestroDetalle\\maestroDetalle\\VideosEmpleados\\";
+    String rutaDirectorio = "C:\\Users\\ASUS\\Documents\\NetBeansProjects\\ProyectoMaestroDetalle\\VideosEmpleados\\";
     String rutaNube = "G:\\Mi unidad\\VideoEmpleados\\";
     //private VideoCapture captureVideo = new VideoCapture(0);
     /**
@@ -604,7 +604,8 @@ public class empleadoGestion extends javax.swing.JPanel implements Observador {
                                     .addComponent(jLabel8)
                                     .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel16)
-                                    .addComponent(jLabel4))
+                                    .addComponent(jLabel4)
+                                    .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(18, 18, 18)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -636,14 +637,12 @@ public class empleadoGestion extends javax.swing.JPanel implements Observador {
                         .addGap(97, 97, 97))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                                .addGap(388, 388, 388))
                             .addComponent(jLabel10)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel18)
                                 .addGap(67, 67, 67)
                                 .addComponent(iD, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(59, 59, 59)
@@ -994,10 +993,16 @@ public class empleadoGestion extends javax.swing.JPanel implements Observador {
 
     private void buscarVideoEmpleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarVideoEmpleadoActionPerformed
         String bd = (String) bdSeleccionado.getSelectedItem();
-
         String idEmpleado = busquedaVideo.getText();
+
+        if (idEmpleado.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, ingrese un ID de empleado.", "ID Vacío", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         String nombreVideo = idEmpleado;
         int IdEmpleado = Integer.parseInt(idEmpleado);
+        byte[] videoBytes = null; // Inicializamos como null
 
         empleadoDao empleadodao = new empleadoDao();
 
@@ -1011,8 +1016,18 @@ public class empleadoGestion extends javax.swing.JPanel implements Observador {
             }
         } catch (IOException | SQLException ex) {
             Logger.getLogger(empleadoGestion.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Error al buscar el video: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
-        mostrarVideo(videoBytes);
+
+        // -- COMIENZO DE LA CORRECCIÓN IMPORTANTE --
+        // Verificamos si se encontraron datos de video antes de intentar mostrarlos
+        if (videoBytes != null && videoBytes.length > 0) {
+            mostrarVideo(videoBytes);
+        } else {
+            // Si no se encuentra video, limpiamos el visor y mostramos un mensaje
+            videoMostrado.setIcon(null); 
+            JOptionPane.showMessageDialog(this, "No se encontró ningún video para el empleado con ID: " + idEmpleado, "Video no encontrado", JOptionPane.INFORMATION_MESSAGE);
+        }
     }//GEN-LAST:event_buscarVideoEmpleadoActionPerformed
 
     private void apellidosPersonaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_apellidosPersonaActionPerformed
@@ -1089,19 +1104,34 @@ public class empleadoGestion extends javax.swing.JPanel implements Observador {
 
     private void refrescarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refrescarActionPerformed
         String cargo = (String) cargoElegido.getSelectedItem();
-        String salario = salarioMenor.getText();
-        float salarioG = Float.parseFloat(salario);
+        String salarioStr = salarioMenor.getText();
+        float salarioG = 0; // Asignamos un valor por defecto de 0
+
+        // Solo intentamos convertir el texto a número si NO está vacío
+        if (salarioStr != null && !salarioStr.isEmpty()) {
+            try {
+                salarioG = Float.parseFloat(salarioStr);
+            } catch (NumberFormatException e) {
+                // Este bloque se ejecuta si el usuario escribe algo que no es un número (ej: "abc")
+                System.err.println("Entrada de salario no válida: " + salarioStr);
+                // Opcional: Podrías mostrar una ventana de error al usuario aquí
+                return; // Salimos del método si la entrada no es válida
+            }
+        }
+
         try {
             empleadoDao empleadodao = new empleadoDao();
-            List<empleadoDTO> empleados = empleadodao.obtenerEmpleados(cargo, salarioG);
+            java.util.List<com.maestrodetalle.DTO.empleadoDTO> empleados = empleadodao.obtenerEmpleados(cargo, salarioG);
             if (empleados.isEmpty()) {
-                System.out.println("Estoy vacío");
+                System.out.println("No se encontraron empleados con esos criterios.");
             }
-            DefaultTableModel modeloTabla = new DefaultTableModel(
+
+            javax.swing.table.DefaultTableModel modeloTabla = new javax.swing.table.DefaultTableModel(
                 new Object[][]{},
                 new String[]{"ID", "Cargo", "Fecha de Ingreso", "Fecha de Salida", "Salario"}
             );
-            for (empleadoDTO empleado : empleados) {
+
+            for (com.maestrodetalle.DTO.empleadoDTO empleado : empleados) {
                 Object[] fila = {
                     empleado.getId(),
                     empleado.getCargo(),
@@ -1112,8 +1142,9 @@ public class empleadoGestion extends javax.swing.JPanel implements Observador {
                 modeloTabla.addRow(fila);
             }
             tablaEmpleados.setModel(modeloTabla);
-        } catch (SQLException ex) {
-            //Logger.getLogger(Estudiante_DataBase.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (java.sql.SQLException ex) {
+            // Aquí deberías manejar el error de SQL, por ejemplo, mostrando un mensaje
+            ex.printStackTrace();
         }
     }//GEN-LAST:event_refrescarActionPerformed
 
@@ -1183,10 +1214,17 @@ public class empleadoGestion extends javax.swing.JPanel implements Observador {
     }
 
     private void mostrarVideo(byte[] videoByte) {
+        if (videoByte == null || videoByte.length == 0) {
+            System.err.println("Se intentó mostrar un video con datos nulos o vacíos.");
+            return; // Salimos del método para evitar errores
+        }
+        // -- FIN DE LA CORRECCIÓN IMPORTANTE --
+
         File tempFile;
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         try {
-            tempFile = File.createTempFile("videoTemp", ".pm4");
+            // Asegúrate de que la extensión del archivo temporal es .mp4
+            tempFile = File.createTempFile("videoTemp", ".mp4"); 
             try (FileOutputStream fos = new FileOutputStream(tempFile)) {
                 fos.write(videoByte);
             }
@@ -1198,21 +1236,24 @@ public class empleadoGestion extends javax.swing.JPanel implements Observador {
         Thread videoHilo = new Thread(() -> {
             try {
                 VideoCapture videoCapture = new VideoCapture(tempFile.getAbsolutePath());
+                if (!videoCapture.isOpened()) {
+                    System.err.println("Error: OpenCV no pudo abrir el archivo de video temporal.");
+                    return;
+                }
                 Mat frame = new Mat();
                 BufferedImage imagen;
                 while (videoCapture.read(frame)) {
                     imagen = convertirABufferedImage(frame);
                     Image imagenEscalada = ajustarVideo(imagen);
                     videoMostrado.setIcon(new ImageIcon(imagenEscalada));
-                    Thread.sleep(20);
+                    Thread.sleep(30); // Ajustado para una velocidad de ~30 FPS
                 }
                 videoCapture.release();
             } catch (InterruptedException e) {
-            // Restaurar el estado de interrupción del hilo
-            Thread.currentThread().interrupt();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+                Thread.currentThread().interrupt();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         });
         videoHilo.start();
     }

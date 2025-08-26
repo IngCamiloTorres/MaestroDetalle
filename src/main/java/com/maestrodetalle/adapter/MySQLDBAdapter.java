@@ -9,7 +9,7 @@ import java.sql.DriverManager;
 import java.util.Properties;
 
 public class MySQLDBAdapter implements IDBAdapter {
-    private static final String DB_PROPERTIES = "C:\\Users\\emman\\OneDrive\\Escritorio\\maestroDetalle\\maestroDetalle\\src\\main\\java\\com\\maestrodetalle\\properties\\DBMySQL.properties";
+    private static final String DB_PROPERTIES = "C:\\Users\\ASUS\\Documents\\NetBeansProjects\\ProyectoMaestroDetalle\\src\\main\\java\\com\\maestrodetalle\\properties\\DBMySQL.properties";
 
     private static MySQLDBAdapter instance; // Instancia única
 
